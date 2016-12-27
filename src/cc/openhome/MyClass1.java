@@ -1,5 +1,11 @@
 package cc.openhome;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+
+import javax.management.RuntimeErrorException;
 
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
@@ -137,23 +143,79 @@ public class MyClass1 {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		/* 在程序每一次循环时，会进行开启网络连接，进行http请求
+		 * 然后在进行写入文档等，在等待网络链接、http协议时很耗时（也就是进入Blocked的时间较长）
+		 * 
+		 * 改进，并行执行。
+		 * 例子:
+		 * */
+		try {
+			Download2();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		/* 在for循环时，会建立全新的Thread并启动，以进行网络下载。
+		 * 可以执行看看与上一个的差别有多少。*/
 	}
 	public static void Download() throws Exception {
+		System.out.println("执行Download");
 		URL[] urls = {
-			new URL("http://caterpillar.onlyfun.net/Gossip/Encoding/"),
-			new URL("http://caterpillar.onlyfun.net/Gossip/Scala/"),
-			new URL("http://caterpillar.onlyfun.net/Gossip/JavaScript/"),
-			new URL("http://caterpillar.onlyfun.net/Gossip/Python/")
+			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
+			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
+			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/projects"),
+			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/wiki")
 		};
 		
 		String[] fileNames = {
-			"Encoding.html",
-			"Scala.html",
-			"JavaScript.html",
-			"Python.html"
+			"issues.html",
+			"pulls.html",
+			"projects.html",
+			"wiki.html"
 		};
 		for (int i = 0; i < urls.length; i++) {
+			dump(urls[i].openStream(), new FileOutputStream(fileNames[i]));
+		}
+	}
+	public static void Download2() throws Exception {
+		System.out.println("执行Download2");
+		URL[] urls = {
+				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
+				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
+				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/projects"),
+				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/wiki")
+			};
 			
+			String[] fileNames = {
+				"issues.html",
+				"pulls.html",
+				"projects.html",
+				"wiki.html"
+			};
+		for (int i = 0; i < urls.length; i++) {
+			// 匿名内部类中存取局部变量，则该变量必须是final
+			final int index = i;
+			new Thread() {
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					System.out.println("index: " + index);
+					try {
+						dump(urls[index].openStream(), new FileOutputStream(fileNames[index]));
+					} catch (Exception e) {
+						// TODO: handle exception
+						throw new RuntimeException(e);
+					}
+				}
+			}.start();
+		}
+	}
+	public static void dump(InputStream src, OutputStream dest) throws IOException{
+		try (InputStream input = src; OutputStream output = dest) {
+			byte[] data = new byte[1024];
+			int length = -1;
+			while ((length = input.read(data)) != -1) {
+				output.write(data, 0, length);
+			}
 		}
 	}
 	public static void exp3_1() {
