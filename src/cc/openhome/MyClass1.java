@@ -1,4 +1,5 @@
 package cc.openhome;
+import java.net.URL;
 
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
@@ -100,7 +101,6 @@ public class MyClass1 {
 		 * 
 		 * 	操作Runnable接口的好处是具有弹性，你的类还有机会继承其他类。(Java只有单继承。)
 		 * 	所以要尽量采用操作接口的方式。
-		 * 
 		 * */
 	}
 	
@@ -110,14 +110,74 @@ public class MyClass1 {
 		 * */
 		
 		/* <1>.Daemon 线程*/
-		exp3_1();
+//		exp3_1();
+		
+		/* <2>.Thread基本状态图*/
+		exp3_2();
+	}
+	public static void exp3_2() {
+		/* <2>.Thread基本状态图
+		 * 
+		 * 在调用Thread实例start()方法之后，基本状态为可执行(Runnable)、被阻断(Blocked)、执行中(Running)。
+		 * 
+		 * start() -> Runnable可执行状态(线程尚未真正开始执行run()方法，等待排班器排班) <-> Running状态 -> Blocked状态(阻断) -> Runnable可执行状态 -> ...
+		 * 																		   -> Dead状态(执行完成)
+		 * 线程具有优先权，可使用Thread的 setPriority()方法设定优先权，可设定值为1到10,默认是5;
+		 * 超出1-10的设定值会抛出 IllegalArgumentException。
+		 * 数字越大优先级越高。（排班器优先排入CPU，优先级相同，则轮流执行。）
+		 * 			
+		 * Blocked状态(阻断):
+		 * 1.调用sleep()方法，就会让线程进入Blocked状态。（还有调用wait()的阻断）
+		 * 2.等待输入／输出完成也会进入Block()状态。
+		 * 
+		 * 例子：指定网页下载网页，不使用线程花费时间：
+		 * */
+		try {
+			Download();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	public static void Download() throws Exception {
+		URL[] urls = {
+			new URL("http://caterpillar.onlyfun.net/Gossip/Encoding/"),
+			new URL("http://caterpillar.onlyfun.net/Gossip/Scala/"),
+			new URL("http://caterpillar.onlyfun.net/Gossip/JavaScript/"),
+			new URL("http://caterpillar.onlyfun.net/Gossip/Python/")
+		};
+		
+		String[] fileNames = {
+			"Encoding.html",
+			"Scala.html",
+			"JavaScript.html",
+			"Python.html"
+		};
+		for (int i = 0; i < urls.length; i++) {
+			
+		}
 	}
 	public static void exp3_1() {
 		/* <1>.Daemon 线程
 		 * 
 		 * 主线程会从main()方法开始执行，直到main()方法结束后停止 JVM。
 		 * 如果主线程中启动了额外线程，默认会等待被启动的所有线程都执行完 run()方法才中止JVM。
-		 * 如果
+		 * 如果一个Thread被标示为Daemon线程，在所有的非Daemon线程都结束时，JVM自动就会终止。
+		 * (在其他的线程结束时，就会终止JVM)
+		 * 
+		 * 从main()方法开始的就是一个非Daemon线程，可以使用setDaemon()方法来设定一个线程是否为Daemon线程。
+		 * 例子：
+		 * 下面的 例子如果没有 setDaemon设定为true，则程序会不断的输出 "Orz"而不终止;
+		 * 使用isDaemon()方法可以判断线程是否为Daemon线程。
 		 * */
+		System.out.println("Daemon线程");
+		Thread thread = new Thread() {
+			public void run() {
+				while (true) {
+					System.out.println("Orz");
+				}
+			}
+		};
+		thread.setDaemon(true); // 要设置setDaemon = true;
+		thread.start();
 	}
 }
