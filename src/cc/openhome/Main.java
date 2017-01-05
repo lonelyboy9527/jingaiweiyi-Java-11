@@ -15,6 +15,7 @@ public class Main {
 		 * */
 //		MyClass1.exp1(); // 11.1.1 线程简介
 //		MyClass1.exp2(); // 11.1.2 Thread 与Runnable
-		MyClass1.exp3(); // 11.1.3 线程生命周期
+//		MyClass1.exp3(); // 11.1.3 线程生命周期
+		MyClass1.exp4(); // 11.1.4 关于ThreadGoup
 	}
 }

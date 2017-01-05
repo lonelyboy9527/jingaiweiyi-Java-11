@@ -9,6 +9,7 @@ import javax.management.RuntimeErrorException;
 
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
+import cc.openhome.class1.Some;
 import cc.openhome.class1.Tortoise;
 import cc.openhome.class1.TortoiseThread;
 
@@ -45,6 +46,7 @@ public class MyClass1 {
 
 		tortoiseThread.start();
 		hareThread.start();
+		
 		
 	}
 	public static void run() {
@@ -119,7 +121,83 @@ public class MyClass1 {
 //		exp3_1();
 		
 		/* <2>.Thread基本状态图*/
-		exp3_2();
+//		exp3_2();
+		
+		/* <3>.安插线程*/
+//		exp3_3();
+		
+		/* <4>.停止线程*/
+		exp3_4();
+	}
+	public static void exp3_4() {
+		/* <4>.停止线程
+		 * 线程执行完 run()后，就会进入Dead，进入Dead()的线程不可以再调用start()方法，否则
+		 * 会抛出IllegalThreadStateException
+		 * */
+		
+		/* Thread类定义有 stop()方法，不过被标示为 Deprecated（表示过去确实定义过，后来因为引发某些问题
+		 * 为了确保兼容性，这些API没有直接剔除，但不建议再使用它），
+		 * 
+		 * 如果使用Deprecated标示的 API，变异程序会剔除警告，而在IDE中，通常会出现删除线表示不建议使用。
+		 * 为什么最新的API不建议使用stop()方法？
+		 * 	因为直接调用stop()方法，将不会理会所设定的释放、取得锁流程，线程会直接释放所有已锁定对象（锁定后面谈），
+		 * 这有可能使对象陷入无法预期状态，
+		 * 
+		 * 除了stop()方法，Thread的 resume()、suspend()、destroy()等方法也不建议使用。
+		 * 
+		 * 如果要停止线程，最后自行操作，让线程跑完所有的流程
+		 * 例子：
+		 * */
+		Some some = new Some();
+		Thread thread = new Thread(some);
+		thread.start();
+		some.stop();
+	}
+	public static void exp3_3() {
+		/* <3>.安插线程
+		 * 
+		 * 如果线程A正在运行，流程中允许B线程加入，等到B线程执行完毕后再继续A线程流程
+		 * 则可以使用join()方法完成这个需求。
+		 * 
+		 * 当线程使用join()加入至另一线程中时，另一个线程会等待被加入的线程工作完毕，然后再继续。
+		 * join()意味着将线程加入至另一线程的流程中。
+		 * */
+		join();
+	}
+	
+	public static void join() {
+		System.out.println("Main thread 开始...");
+		Thread threadB = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					System.out.println("Thread B 开始...");
+					for (int i = 0; i < 5; i++) {
+						Thread.sleep(1000);
+						System.out.println("Thread B 执行...");
+					}
+					System.out.println("Thread B 将结束...");
+				} catch (InterruptedException e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+			}
+		};
+		threadB.start();
+		try {
+			// Thread B 加入Main  thread流程
+			threadB.join();
+			/* 有时候，加入的线程可能处理太久，不想等待这个线程执行完毕，
+			 * 则可以在join()时指定时间，如join(1000),如果1000毫秒这个线程还没有执行完毕，
+			 * 就不理它了，目前的线程可执行原本工作流程。
+			 * */ 
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		System.out.println("Main thread 将结束...");
 	}
 	public static void exp3_2() {
 		/* <2>.Thread基本状态图
@@ -156,6 +234,31 @@ public class MyClass1 {
 		}
 		/* 在for循环时，会建立全新的Thread并启动，以进行网络下载。
 		 * 可以执行看看与上一个的差别有多少。*/
+
+		/* 一个进入Blocked状态的线程，可以由另一个线程调用该线程的interrupt()方法
+		 * 让它离开Blocked状态。
+		 * 
+		 * 例如：使用Thread.sleep()会让线程进入Blocked状态，若此时有其他线程调用该线程的interrupt()方法，
+		 * 会抛出InterruptedException异常对象，这是让线程“醒过来”的方式。
+		 * 例子：
+		 * */
+		Interrupted();
+	}
+	public static void Interrupted() {
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					Thread.sleep(9999);
+				} catch (InterruptedException e) {
+					// TODO: handle exception
+					System.out.println("我醒了XD");
+				}
+			}
+		};
+		thread.start();
+		thread.interrupt();
 	}
 	public static void Download() throws Exception {
 		System.out.println("执行Download");
@@ -241,5 +344,9 @@ public class MyClass1 {
 		};
 		thread.setDaemon(true); // 要设置setDaemon = true;
 		thread.start();
+	}
+	// 关于ThreadGroup
+	public static void exp4() {
+		
 	}
 }
