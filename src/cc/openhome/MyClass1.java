@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-
-import javax.management.RuntimeErrorException;
+import java.util.ArrayList;
 
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
@@ -347,6 +346,162 @@ public class MyClass1 {
 	}
 	// 关于ThreadGroup
 	public static void exp4() {
+		/* 每个线程都属于一个线程群组（ThreadGroup）
+		 * 若在main()主流程中产生一个线程，该线程会属于main线程群组。
+		 * 
+		 * 可以使用以下获得目前线程的所属的线程组名：
+		 * Thread.currentThread().getThreadGroup.getName();
+		 * 
+		 * 每个线程产生时，都会归入某个线程群组，这看线程在哪个群组中产生。
+		 * 如果没有指定，则归入产生该子线程的线程群组，也可以自行指定线程群组，线程一旦归入某个群组，就无法更换群组。
+		 * 
+		 * java.lang.ThreadGroup类正如其名，可以管理群组中的线程。
+		 * 例子：产生群组，并在产生线程时指定所属群组：
+		 * */
+		ThreadGroup threadGroup = new ThreadGroup("group1");
+		ThreadGroup threadGroup2 = new ThreadGroup("group2");
 		
+		Thread thread = new Thread(threadGroup, "group1's member");
+		Thread thread2 = new Thread(threadGroup, "group2's member");
+		
+		/* ThreadGroup的某些方法，可以对群组中的所有线程产生作用
+		 * 
+		 * 例如：interrupt()方法可以中断群组中的所有线程。
+		 * 		setMaxPriority()方法可以设定群组中所有线程的最大优先权。
+		 * */
+		
+		/* 一次取得群组中的所有线程，可以使用 enumerate()方法。
+		 * 例如：
+		 * */
+		Thread[] threads = new Thread[threadGroup.activeCount()]; // activeCount取得群组中线程数量
+		threadGroup.enumerate(threads); // enumerate传入Thread数组，这会将线程对象设定至每个数组索引
+		 
+		/* ThreadGroup 中有个uncaughtException()方法，群组中某个线程发生异常而未捕捉时，
+		 * JVM会调用此方法进行处理。(如果群组有父群组，则调用父群组的)
+		 * 
+		 * 例子：uncaughtException的例子
+		 * */
+//		threadGroupDemo();
+		
+		
+		/* 对于线程本身未捕捉的异常，可以自行指定处理方式。
+		 * 例子：
+		 * */
+		threadGroupDemo2();
+		
+		/* 在这个例子中，t1, t2都是属于同一个 ThreadGroup
+		 * 
+		 * t1设定了Thread.UncaughtExceptionHandler实例，所以未捕捉的异常会以
+		 * thread.UncaughtExceptionHandler定义的方式处理
+		 * 
+		 * t2没有设置，所以由ThreadGroup默认的第三个处理方式。显示堆栈追踪。
+		 * */
+	}
+	public static void threadGroupDemo2() {
+		ThreadGroup tg1 = new ThreadGroup("tg1"); 
+		Thread t1 = new Thread(tg1, new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				// 人为制造异常，并且抛出
+				throw new RuntimeException("测试异常");
+			}
+		});
+		t1.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// TODO Auto-generated method stub
+				System.out.printf("%s: %s%n",t.getName(), e.getMessage());
+			}
+		});
+		Thread t2 = new Thread(tg1, new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				throw new RuntimeException("t2 测试异常");
+			}
+		});
+		t1.start();
+		t2.start();
+
+	}
+	public static void threadGroupDemo() {
+		ThreadGroup tg1 = new ThreadGroup("tg1") {
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// JVM调用 uncaughtException进行处理
+				System.out.printf("%s: %s%n", t.getName(), e.getMessage());
+			}
+			
+			/* JDK5之后，uncaughtException处理顺序是：
+			 * 
+			 * 1.如果ThreadGroup有父ThreadGroup，就会调用父ThreadGroup的uncaughtException。
+			 * 2.否则，看看Thread是否使用setUncaughtExceptionHandler()方法设定Thread.Uncaught-ExceptionHandler实例
+			 * 		有的话，就调用其uncaughtException。
+			 * 3.否则，看看异常是否为ThreadGroup实例，若是，则什么都不做，若否则调用异常的printStrackTrace()。
+			 * */
+		};
+		Thread t1 = new Thread(tg1, new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				// 人为制造异常，并且抛出
+				throw new RuntimeException("测试异常");
+			}
+		});
+		t1.start();		
+	}
+	
+	// synchronized与volatile
+	public static void exp5() {
+		/* 还记得以前自己开发过 ArrayList类吗？
+		 * 在没有接触线程前，也就是将那个ArrayList用在主线程的环境中，没有什么问题，
+		 * 如果同时使用在两个以上的线程，会如何？
+		 * 
+		 * 例子：
+		 * */
+//		ArrayListDemo();
+		/* 会发生java.lang.ArrayIndexOutOfBoundsException异常，因为两个在同时运行 add()方法时
+		 * 在内部 list[next++] = o；会产生越界。具体要自己分析
+		 * 
+		 * 因为t1,t2会同时存取next，使得next在巧合的情况下，脱离原本应管控的条件，
+		 * 我们称这样的类为 不具备线程安全(Thread-safe)的类。
+		 * */
+		
+		/* <1>.使用synchronized*/
+		exp5_1();
+	}
+	public static void exp5_1() {
+		/* <1>.使用synchronized
+		 * 
+		 * 可以在add()方法上加上 synchronized关键字。
+		 * 在加上 synchronized关键字之后，再次执行前面范例，就不会看到 ArrayIndexOutOfBoundsException了
+		 * */
+	}
+	public static void ArrayListDemo() {
+		final ArrayList<Integer> list = new ArrayList<Integer>();
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					list.add(1);
+				}
+			}
+		};
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					list.add(2);
+				}
+			}
+		};
+		t1.start();
+		t2.start();
 	}
 }
