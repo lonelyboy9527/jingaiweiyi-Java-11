@@ -1,17 +1,21 @@
 package cc.openhome;
 import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
 import cc.openhome.class1.Some;
 import cc.openhome.class1.Tortoise;
 import cc.openhome.class1.TortoiseThread;
-
+import cc.openhome.class1.Material;
+import cc.openhome.class1.Resource;
 public class MyClass1 {
 	// 线程简介
 	public static void exp1() {
@@ -479,9 +483,123 @@ public class MyClass1 {
 		 * 
 		 * 可以在add()方法上加上 synchronized关键字。
 		 * 在加上 synchronized关键字之后，再次执行前面范例，就不会看到 ArrayIndexOutOfBoundsException了
+		 * 
+		 * 每个对象都有个内部锁定（监控锁定）。被标示为synchronized的区块将会被监控，任何线程要执行synchronized区块，
+		 * 都必须先取得指定的对象锁定。
+		 * 
+		 * 如果A取得了，B进入等待锁定状态，直到A线程释放锁定（例如执行完synchronized区块），B线程才有机会取得锁定而执行synchronized区块。
+		 * 注意：一个线程等待对象锁定时，会进入 Blocked状态。
+		 * 
+		 * synchronized不仅可以声明在方法上，也可以 描述句方式使用。
+		 * 	synchronized(this):表示在线程执行synchronized区块时，必须取得括号中对象锁定。
+		 * 
+		 * */
+//		exp5_1_1();
+		
+		/* 第9章中，介绍的Collection 与Map，都未考虑线程安全，
+		 * 可以使用 Collection 的 synchronizedCollection()、synchronizedList()、synchronizedSet()、synchronizedMap()等方法
+		 * 这些方法会将传入的 Collection、List、Set、Map操作对象打包，返回具线程安全的对象。
+		 * 
+		 * 例子：如果经常进行以下List操作：
+		 * */
+//		exp5_1_2();
+		
+		/* 使用synchronized描述句，可以做到更细致的控制，例如：
+		 * 提供不同对象作为锁定来源
+		 * */
+//		Material();
+		
+		/* Java的synchronized提供的是可重入同步(Reentrant synchronized)，也就是线程取得某个对象后，
+		 * 若执行过程中又要执行synchronized，尝试取得锁定的对象来源又是同一个，则可直接执行。
+		 * 
+		 * 注意：synchronized使用不当会造成 死结
+		 * 例子：
+		 * */ 
+		Resource();
+	}
+	public static void Resource() {
+		System.out.println("Resource -> 死结");
+		final Resource resource = new Resource("哈哈哈", 10);
+		final Resource resource2 = new Resource("嘻嘻嘻", 20);
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < 10; i++) {
+					resource.cooperate(resource2);
+				}
+			}
+		};
+		
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < 10; i++) {
+					resource2.cooperate(resource);
+				}
+			}
+		};
+		t1.start();
+		t2.start();
+	}
+	public static void Material() {
+		System.out.println("Material -> 共享存取");
+		Material material = new Material();
+		material.doSome();
+		material.doOther();
+		/* 在这里想避免doSome()或是doOther()中，同时被两个以上线程执行 synchronized区块
+		 * 注意data1和data2并不在同一个方法中，所以有个线程 执行doSome，另一个线程执行doOther
+		 * 时，并不会引发共享存取问题，此时分别提供不同对象作为锁定来源。
 		 * */
 	}
+	public static void exp5_1_2() {
+		System.out.println("exp5_1_2 -> synchronizedList");
+		List<String> list2 = new ArrayList<String>();
+		synchronized (list2) {
+			list2.add("...");
+		}
+		synchronized (list2) {
+			list2.remove("...");
+		}
+		/* 可以简化如下: */
+		List list3 = Collections.synchronizedList(new ArrayList<String>());
+		list3.add("...");
+		list3.remove("...");
+	}
+	public static void exp5_1_1() {
+		System.out.println("exp5_1_1 -> synchronized");
+		final ArrayList<Integer> list = new ArrayList<Integer>();
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					synchronized (list) { 
+						/* 必须取得list参考的对象锁定，因而也能确保add()执行完成
+							避免t1,t2同时调用add()方法而引发竞速问题。
+					*/
+						list.add(1);
+					}
+				}
+			}
+		};
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					synchronized (list) {
+						list.add(2);
+					}
+				}
+			}
+		};
+		t1.start();
+		t2.start();
+	}
 	public static void ArrayListDemo() {
+		System.out.println("ArrayListDemo");
 		final ArrayList<Integer> list = new ArrayList<Integer>();
 		Thread t1 = new Thread() {
 			@Override
