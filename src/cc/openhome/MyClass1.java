@@ -15,7 +15,11 @@ import cc.openhome.class1.Some;
 import cc.openhome.class1.Tortoise;
 import cc.openhome.class1.TortoiseThread;
 import cc.openhome.class1.Material;
+import cc.openhome.class1.MySome;
 import cc.openhome.class1.Resource;
+import cc.openhome.class1.Variable;
+import cc.openhome.class1.Variable2;
+import cc.openhome.class1.Variable3;
 public class MyClass1 {
 	// 线程简介
 	public static void exp1() {
@@ -132,75 +136,29 @@ public class MyClass1 {
 		/* <4>.停止线程*/
 		exp3_4();
 	}
-	public static void exp3_4() {
-		/* <4>.停止线程
-		 * 线程执行完 run()后，就会进入Dead，进入Dead()的线程不可以再调用start()方法，否则
-		 * 会抛出IllegalThreadStateException
-		 * */
-		
-		/* Thread类定义有 stop()方法，不过被标示为 Deprecated（表示过去确实定义过，后来因为引发某些问题
-		 * 为了确保兼容性，这些API没有直接剔除，但不建议再使用它），
+	public static void exp3_1() {
+		/* <1>.Daemon 线程
 		 * 
-		 * 如果使用Deprecated标示的 API，变异程序会剔除警告，而在IDE中，通常会出现删除线表示不建议使用。
-		 * 为什么最新的API不建议使用stop()方法？
-		 * 	因为直接调用stop()方法，将不会理会所设定的释放、取得锁流程，线程会直接释放所有已锁定对象（锁定后面谈），
-		 * 这有可能使对象陷入无法预期状态，
+		 * 主线程会从main()方法开始执行，直到main()方法结束后停止 JVM。
+		 * 如果主线程中启动了额外线程，默认会等待被启动的所有线程都执行完 run()方法才中止JVM。
+		 * 如果一个Thread被标示为Daemon线程，在所有的非Daemon线程都结束时，JVM自动就会终止。
+		 * (在其他的线程结束时，就会终止JVM)
 		 * 
-		 * 除了stop()方法，Thread的 resume()、suspend()、destroy()等方法也不建议使用。
-		 * 
-		 * 如果要停止线程，最后自行操作，让线程跑完所有的流程
+		 * 从main()方法开始的就是一个非Daemon线程，可以使用setDaemon()方法来设定一个线程是否为Daemon线程。
 		 * 例子：
+		 * 下面的 例子如果没有 setDaemon设定为true，则程序会不断的输出 "Orz"而不终止;
+		 * 使用isDaemon()方法可以判断线程是否为Daemon线程。
 		 * */
-		Some some = new Some();
-		Thread thread = new Thread(some);
-		thread.start();
-		some.stop();
-	}
-	public static void exp3_3() {
-		/* <3>.安插线程
-		 * 
-		 * 如果线程A正在运行，流程中允许B线程加入，等到B线程执行完毕后再继续A线程流程
-		 * 则可以使用join()方法完成这个需求。
-		 * 
-		 * 当线程使用join()加入至另一线程中时，另一个线程会等待被加入的线程工作完毕，然后再继续。
-		 * join()意味着将线程加入至另一线程的流程中。
-		 * */
-		join();
-	}
-	
-	public static void join() {
-		System.out.println("Main thread 开始...");
-		Thread threadB = new Thread() {
-			@Override
+		System.out.println("Daemon线程");
+		Thread thread = new Thread() {
 			public void run() {
-				// TODO Auto-generated method stub
-				try {
-					System.out.println("Thread B 开始...");
-					for (int i = 0; i < 5; i++) {
-						Thread.sleep(1000);
-						System.out.println("Thread B 执行...");
-					}
-					System.out.println("Thread B 将结束...");
-				} catch (InterruptedException e) {
-					// TODO: handle exception
-					e.printStackTrace();
+				while (true) {
+					System.out.println("Orz");
 				}
 			}
 		};
-		threadB.start();
-		try {
-			// Thread B 加入Main  thread流程
-			threadB.join();
-			/* 有时候，加入的线程可能处理太久，不想等待这个线程执行完毕，
-			 * 则可以在join()时指定时间，如join(1000),如果1000毫秒这个线程还没有执行完毕，
-			 * 就不理它了，目前的线程可执行原本工作流程。
-			 * */ 
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		System.out.println("Main thread 将结束...");
+		thread.setDaemon(true); // 要设置setDaemon = true;
+		thread.start();
 	}
 	public static void exp3_2() {
 		/* <2>.Thread基本状态图
@@ -246,22 +204,6 @@ public class MyClass1 {
 		 * 例子：
 		 * */
 		Interrupted();
-	}
-	public static void Interrupted() {
-		Thread thread = new Thread() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				try {
-					Thread.sleep(9999);
-				} catch (InterruptedException e) {
-					// TODO: handle exception
-					System.out.println("我醒了XD");
-				}
-			}
-		};
-		thread.start();
-		thread.interrupt();
 	}
 	public static void Download() throws Exception {
 		System.out.println("执行Download");
@@ -315,6 +257,92 @@ public class MyClass1 {
 			}.start();
 		}
 	}
+	public static void Interrupted() {
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					Thread.sleep(9999);
+				} catch (InterruptedException e) {
+					// TODO: handle exception
+					System.out.println("我醒了XD");
+				}
+			}
+		};
+		thread.start();
+		thread.interrupt();
+	}
+	public static void exp3_3() {
+		/* <3>.安插线程
+		 * 
+		 * 如果线程A正在运行，流程中允许B线程加入，等到B线程执行完毕后再继续A线程流程
+		 * 则可以使用join()方法完成这个需求。
+		 * 
+		 * 当线程使用join()加入至另一线程中时，另一个线程会等待被加入的线程工作完毕，然后再继续。
+		 * join()意味着将线程加入至另一线程的流程中。
+		 * */
+		join();
+	}
+	public static void join() {
+		System.out.println("Main thread 开始...");
+		Thread threadB = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					System.out.println("Thread B 开始...");
+					for (int i = 0; i < 5; i++) {
+						Thread.sleep(1000);
+						System.out.println("Thread B 执行...");
+					}
+					System.out.println("Thread B 将结束...");
+				} catch (InterruptedException e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+			}
+		};
+		threadB.start();
+		try {
+			// Thread B 加入Main  thread流程
+			threadB.join();
+			/* 有时候，加入的线程可能处理太久，不想等待这个线程执行完毕，
+			 * 则可以在join()时指定时间，如join(1000),如果1000毫秒这个线程还没有执行完毕，
+			 * 就不理它了，目前的线程可执行原本工作流程。
+			 * */ 
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		System.out.println("Main thread 将结束...");
+	}
+	public static void exp3_4() {
+		/* <4>.停止线程
+		 * 线程执行完 run()后，就会进入Dead，进入Dead()的线程不可以再调用start()方法，否则
+		 * 会抛出IllegalThreadStateException
+		 * */
+		
+		/* Thread类定义有 stop()方法，不过被标示为 Deprecated（表示过去确实定义过，后来因为引发某些问题
+		 * 为了确保兼容性，这些API没有直接剔除，但不建议再使用它），
+		 * 
+		 * 如果使用Deprecated标示的 API，变异程序会剔除警告，而在IDE中，通常会出现删除线表示不建议使用。
+		 * 为什么最新的API不建议使用stop()方法？
+		 * 	因为直接调用stop()方法，将不会理会所设定的释放、取得锁流程，线程会直接释放所有已锁定对象（锁定后面谈），
+		 * 这有可能使对象陷入无法预期状态，
+		 * 
+		 * 除了stop()方法，Thread的 resume()、suspend()、destroy()等方法也不建议使用。
+		 * 
+		 * 如果要停止线程，最后自行操作，让线程跑完所有的流程
+		 * 例子：
+		 * */
+		Some some = new Some();
+		Thread thread = new Thread(some);
+		thread.start();
+		some.stop();
+	}
+	
 	public static void dump(InputStream src, OutputStream dest) throws IOException{
 		try (InputStream input = src; OutputStream output = dest) {
 			byte[] data = new byte[1024];
@@ -324,30 +352,7 @@ public class MyClass1 {
 			}
 		}
 	}
-	public static void exp3_1() {
-		/* <1>.Daemon 线程
-		 * 
-		 * 主线程会从main()方法开始执行，直到main()方法结束后停止 JVM。
-		 * 如果主线程中启动了额外线程，默认会等待被启动的所有线程都执行完 run()方法才中止JVM。
-		 * 如果一个Thread被标示为Daemon线程，在所有的非Daemon线程都结束时，JVM自动就会终止。
-		 * (在其他的线程结束时，就会终止JVM)
-		 * 
-		 * 从main()方法开始的就是一个非Daemon线程，可以使用setDaemon()方法来设定一个线程是否为Daemon线程。
-		 * 例子：
-		 * 下面的 例子如果没有 setDaemon设定为true，则程序会不断的输出 "Orz"而不终止;
-		 * 使用isDaemon()方法可以判断线程是否为Daemon线程。
-		 * */
-		System.out.println("Daemon线程");
-		Thread thread = new Thread() {
-			public void run() {
-				while (true) {
-					System.out.println("Orz");
-				}
-			}
-		};
-		thread.setDaemon(true); // 要设置setDaemon = true;
-		thread.start();
-	}
+	
 	// 关于ThreadGroup
 	public static void exp4() {
 		/* 每个线程都属于一个线程群组（ThreadGroup）
@@ -401,6 +406,33 @@ public class MyClass1 {
 		 * t2没有设置，所以由ThreadGroup默认的第三个处理方式。显示堆栈追踪。
 		 * */
 	}
+	public static void threadGroupDemo() {
+		ThreadGroup tg1 = new ThreadGroup("tg1") {
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// JVM调用 uncaughtException进行处理
+				System.out.printf("%s: %s%n", t.getName(), e.getMessage());
+			}
+			
+			/* JDK5之后，uncaughtException处理顺序是：
+			 * 
+			 * 1.如果ThreadGroup有父ThreadGroup，就会调用父ThreadGroup的uncaughtException。
+			 * 2.否则，看看Thread是否使用setUncaughtExceptionHandler()方法设定Thread.Uncaught-ExceptionHandler实例
+			 * 		有的话，就调用其uncaughtException。
+			 * 3.否则，看看异常是否为ThreadGroup实例，若是，则什么都不做，若否则调用异常的printStrackTrace()。
+			 * */
+		};
+		Thread t1 = new Thread(tg1, new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				// 人为制造异常，并且抛出
+				throw new RuntimeException("测试异常");
+			}
+		});
+		t1.start();		
+	}
 	public static void threadGroupDemo2() {
 		ThreadGroup tg1 = new ThreadGroup("tg1"); 
 		Thread t1 = new Thread(tg1, new Runnable() {
@@ -429,36 +461,7 @@ public class MyClass1 {
 		});
 		t1.start();
 		t2.start();
-
 	}
-	public static void threadGroupDemo() {
-		ThreadGroup tg1 = new ThreadGroup("tg1") {
-			@Override
-			public void uncaughtException(Thread t, Throwable e) {
-				// JVM调用 uncaughtException进行处理
-				System.out.printf("%s: %s%n", t.getName(), e.getMessage());
-			}
-			
-			/* JDK5之后，uncaughtException处理顺序是：
-			 * 
-			 * 1.如果ThreadGroup有父ThreadGroup，就会调用父ThreadGroup的uncaughtException。
-			 * 2.否则，看看Thread是否使用setUncaughtExceptionHandler()方法设定Thread.Uncaught-ExceptionHandler实例
-			 * 		有的话，就调用其uncaughtException。
-			 * 3.否则，看看异常是否为ThreadGroup实例，若是，则什么都不做，若否则调用异常的printStrackTrace()。
-			 * */
-		};
-		Thread t1 = new Thread(tg1, new Runnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				// 人为制造异常，并且抛出
-				throw new RuntimeException("测试异常");
-			}
-		});
-		t1.start();		
-	}
-	
 	// synchronized与volatile
 	public static void exp5() {
 		/* 还记得以前自己开发过 ArrayList类吗？
@@ -476,7 +479,34 @@ public class MyClass1 {
 		 * */
 		
 		/* <1>.使用synchronized*/
-		exp5_1();
+//		exp5_1();
+		
+		/* <2>.使用volatile*/
+		exp5_2();
+	}
+	public static void ArrayListDemo() {
+		System.out.println("ArrayListDemo");
+		final ArrayList<Integer> list = new ArrayList<Integer>();
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					list.add(1);
+				}
+			}
+		};
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					list.add(2);
+				}
+			}
+		};
+		t1.start();
+		t2.start();
 	}
 	public static void exp5_1() {
 		/* <1>.使用synchronized
@@ -516,57 +546,19 @@ public class MyClass1 {
 		 * 例子：
 		 * */ 
 		Resource();
-	}
-	public static void Resource() {
-		System.out.println("Resource -> 死结");
-		final Resource resource = new Resource("哈哈哈", 10);
-		final Resource resource2 = new Resource("嘻嘻嘻", 20);
-		Thread t1 = new Thread() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				for (int i = 0; i < 10; i++) {
-					resource.cooperate(resource2);
-				}
-			}
-		};
-		
-		Thread t2 = new Thread() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				for (int i = 0; i < 10; i++) {
-					resource2.cooperate(resource);
-				}
-			}
-		};
-		t1.start();
-		t2.start();
-	}
-	public static void Material() {
-		System.out.println("Material -> 共享存取");
-		Material material = new Material();
-		material.doSome();
-		material.doOther();
-		/* 在这里想避免doSome()或是doOther()中，同时被两个以上线程执行 synchronized区块
-		 * 注意data1和data2并不在同一个方法中，所以有个线程 执行doSome，另一个线程执行doOther
-		 * 时，并不会引发共享存取问题，此时分别提供不同对象作为锁定来源。
+		/* 这个例子会不会发生死结，也是个几率问题
+		 * 
+		 * 发生死结的原因：t1在调用 resource.cooperate(resource2);时，会取得resource的锁定，
+		 * 	若此时t2正好也调用 resource2.cooperate(resource);，会取得resource2的锁定，
+		 * 凑巧t1现在打算运用传入的resource2调用 doSome()，理应取得resource2的锁定，但锁定现在被t2
+		 * 拿走了，于是t1进入阻断，而t2也打算运用传入的resource调用doSome()，理应取得resource的锁定
+		 * 
+		 * 但锁定现在是t1取走，于是t2也进入等待。 
+		 * 
+		 * Java在死结发生时，陷入停顿状态，所以必须避免 
 		 * */
 	}
-	public static void exp5_1_2() {
-		System.out.println("exp5_1_2 -> synchronizedList");
-		List<String> list2 = new ArrayList<String>();
-		synchronized (list2) {
-			list2.add("...");
-		}
-		synchronized (list2) {
-			list2.remove("...");
-		}
-		/* 可以简化如下: */
-		List list3 = Collections.synchronizedList(new ArrayList<String>());
-		list3.add("...");
-		list3.remove("...");
-	}
+	
 	public static void exp5_1_1() {
 		System.out.println("exp5_1_1 -> synchronized");
 		final ArrayList<Integer> list = new ArrayList<Integer>();
@@ -598,15 +590,116 @@ public class MyClass1 {
 		t1.start();
 		t2.start();
 	}
-	public static void ArrayListDemo() {
-		System.out.println("ArrayListDemo");
-		final ArrayList<Integer> list = new ArrayList<Integer>();
+	public static void exp5_1_2() {
+		System.out.println("exp5_1_2 -> synchronizedList");
+		List<String> list2 = new ArrayList<String>();
+		synchronized (list2) {
+			list2.add("...");
+		}
+		synchronized (list2) {
+			list2.remove("...");
+		}
+		/* 可以简化如下: */
+		List list3 = Collections.synchronizedList(new ArrayList<String>());
+		list3.add("...");
+		list3.remove("...");
+	}
+	public static void Material() {
+		System.out.println("Material -> 共享存取");
+		Material material = new Material();
+		material.doSome();
+		material.doOther();
+		/* 在这里想避免doSome()或是doOther()中，同时被两个以上线程执行 synchronized区块
+		 * 注意data1和data2并不在同一个方法中，所以有个线程 执行doSome，另一个线程执行doOther
+		 * 时，并不会引发共享存取问题，此时分别提供不同对象作为锁定来源。
+		 * */
+	}
+	public static void Resource() {
+		System.out.println("Resource -> 死结");
+		final Resource resource = new Resource("哈哈哈", 10);
+		final Resource resource2 = new Resource("嘻嘻嘻", 20);
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < 10; i++) {
+					resource.cooperate(resource2);
+				}
+			}
+		};
+		
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < 10; i++) {
+					resource2.cooperate(resource);
+				}
+			}
+		};
+		t1.start();
+		t2.start();
+	}
+	
+	public static void exp5_2() {
+		/* <2>.使用volatile
+		 * 
+		 * synchronized要求达到的所标示区块的互斥性与可见性，
+		 * 
+		 * 互斥性：指synchronized区块同时间只能有一个线程
+		 * 可见性：指线程离开synchronized区块后，另一线程接触到的就是上一线程改变后的对象状态。
+		 * 
+		 * 在Java中对于可见性的要求，可以使用volatile达到变量范围。在讨论变量可见性前，
+		 * 
+		 * 可以看下面例子：
+		 * 
+		 * 这个程序执行，有可能出现j远远大于i的结果，
+		 * 因为两个线程在来回切换，可能在t2执行two()取得i之后，切换至t1一直执行one()，
+		 * 然后又回来执行t2的two()方法，取得j值，此时取得的j比之前取得的i值大。
+		 * */
+//		VariableTest();
+		
+		/* 解决方法：可以在 one()和 two()前面标示 synchronized，
+		 * 这样可以锁定对象。
+		 * 例子：
+		 * 
+		 * 由于synchronized会造成线程阻断，执行one()时，就不能执行two()，
+		 * 可以看到速度明显变慢。
+		 * */
+//		VariableTest2();
+		/* 解决方法：
+		 * 可以在变量声明为 volatile，表示变量是不稳定，易变的。
+		 * 也就是可能在多个线程下存取，这保证变量的可见性，也就是若有线程变动了变量值，
+		 * 另一个线程一定可以看到变更。被标示为volatile的变量，不允许线程快取，变量值的存取一定是在共享内存中进行。
+		 * 举例子：
+		 * 
+		 * 将i和j声明为 volatile
+		 * */
+		VariableTest3();
+		/* 注意，虽然这样改过了，但是可能还是会出现j>i的情况，但是减少很多。
+		 * 
+		 * 使用了volatile标示保证的是单一数的可见性，线程对变量的存取一定是在  <共享内存中> ，
+		 * 不会在自己的内存中快取变量，线程对共享内存中对变量的存取，另一线程一定看的到。
+		 * 
+		 * 注意，实际上，想一定使得 i == j，那么还是采用第二种方法，
+		 * 因为采用volatile只保证 t1对 i 或者j变量值的设定，t2一定可见，
+		 * one()中包括了i++, j++两个描述，要保证这两个描述执行完，本来就该用synchronized，t
+		 * wo()中包括了取得i,j变量值及执行 System.out.printf()等动作，要保证这些描述执行完，也是synchronized的职责。
+		 * 
+		 * 
+		 * 例子：以下是正确使用 volatile的例子:
+		 * */
+		MySome mySome = new MySome();
+		
+	}
+	public static void VariableTest() {
+		System.out.println("VariableTest...");
 		Thread t1 = new Thread() {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				while (true) {
-					list.add(1);
+					Variable.one();
 				}
 			}
 		};
@@ -615,7 +708,53 @@ public class MyClass1 {
 			public void run() {
 				// TODO Auto-generated method stub
 				while (true) {
-					list.add(2);
+					Variable.two();
+				}
+			}
+		};
+		t1.start();
+		t2.start();
+	}
+	public static void VariableTest2() {
+		System.out.println("VariableTest2...");
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					Variable2.one();
+				}
+			}
+		};
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					Variable2.two();
+				}
+			}
+		};
+		t1.start();
+		t2.start();
+	}
+	public static void VariableTest3() {
+		System.out.println("VariableTest3...");
+		Thread t1 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					Variable3.one();
+				}
+			}
+		};
+		Thread t2 = new Thread() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					Variable3.two();
 				}
 			}
 		};
