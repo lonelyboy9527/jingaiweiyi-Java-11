@@ -15,10 +15,10 @@ import cc.openhome.class2.Producer2;
 import cc.openhome.class2.Clerk3;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 public class MyClass2 {
 	// Lock、ReadWriteLock 与 Condition
 	public static void exp1() {
@@ -244,8 +244,12 @@ public class MyClass2 {
 	}
 	// 线程池
 	public static void exp2_1() {
+		System.out.println("线程池");
 		/* <1>.使用ThreadPoolExecutor*/
-		ThreadPoolExecutor();
+//		ThreadPoolExecutor();
+		
+		/* <2>.使用ScheduledThreadPoolExecutor*/
+		ScheduledThreadPoolExecutor();
 	}
 	public static void ThreadPoolExecutor() {
 		/* <1>.使用ThreadPoolExecutor
@@ -284,24 +288,26 @@ public class MyClass2 {
 		 * 
 		 * 举个例子：Future与Callable运用的实例，在未来某个时间获取 斐波那契数字
 		 * */
-		FutureTask<Long> fib30 = new FutureTask<> (
-			new Callable<Long>() {
-				public Long call() {
-					return FutureCallable.fibonacci(30);
-				}
-			}
-		);
-		System.out.println("老板，我要第 30 个费式数，待会来拿......");
-		new Thread(fib30).start();
-		System.out.println("忙别的事去......");
-		try {
-			Thread.sleep(5000);
-			System.out.printf("第 30 个费式数: %d\n", fib30.get());
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-				
+//		FutureCallable();
+		
+		/* 如果你的流程已定义在某个Runnable对象中，FutureTask创建时也有接受Runnable的版本
+		 * 并可指定一个对象在调用get()时返回(运算结束后)
+		 * 
+		 * 回头看看ExecutorService的submit()方法，它可以接受Callable对象，调用后返回的 
+		 * Future对象，就是让你在稍后可以取得运算结果。
+		 * 
+		 * 例如，改写以上的范例为使用 ExecutorService的版本：
+		 * */
+		FutureCallable2();
+		/* 范例中的执行结果与上个例子相同。
+		 * 
+		 * 如果有多个Callable，可以先收集为 Collection中，然后调用 ExecutorService的
+		 * invokeAll()，这会以 List<Future<T>>返回与 Callable相关联的Future对象。
+		 * 
+		 * 如果有多个 Callable，只要有一个执行完成就可以。那可以先收集在 Collection中，
+		 * 然后调用 ExecutorService的invokeAny()，只要Collection其中一个Callable完成，
+		 * invokeAny()就会返回该Callavle的执行结果。
+		 * */
 	}
 	public static void download3() {
 		URL[] urls = null;
@@ -329,5 +335,49 @@ public class MyClass2 {
 		
 		// 还有另一个 shutdownNow()方法，则可以立即关闭 ExecutorService，尚未执行的Runnable对象会以 List<Runnable>返回
 		executorService.shutdown();
+	}
+	
+	public static void FutureCallable() {
+		FutureTask<Long> fib30 = new FutureTask<> (
+				new Callable<Long>() {
+					public Long call() {
+						return FutureCallable.fibonacci(30);
+					}
+				}
+			);
+			System.out.println("老板，我要第 30 个费式数，待会来拿......");
+			new Thread(fib30).start();
+			System.out.println("先忙别的事去......");
+			try {
+				Thread.sleep(5000);
+				System.out.printf("第 30 个费式数: %d\n", fib30.get());
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+	}
+	public static void FutureCallable2() {
+		ExecutorService service = Executors.newCachedThreadPool();
+		System.out.println("老板，我要第 30 个费式数，待会来拿......");
+		Future<Long> fib30 = service.submit(new Callable<Long>() {
+			public Long call() {
+				return FutureCallable.fibonacci(30);
+			}
+		});
+		System.out.println("先忙别的事去......");
+		try {
+			Thread.sleep(5000);
+			System.out.printf("第 30 个费式数: %d\n", fib30.get());
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
+	public static void ScheduledThreadPoolExecutor() {
+		/* <2>.使用ScheduledThreadPoolExecutor
+		 * 
+		 * 
+		 * */
 	}
 }
