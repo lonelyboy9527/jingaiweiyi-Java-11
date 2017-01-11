@@ -1,13 +1,21 @@
 package cc.openhome;
 
 import cc.openhome.class2.Resource2;
+import cc.openhome.class2.ThreadPerTaskExecutor;
 
+import java.net.URL;
 import cc.openhome.class2.ArrayList;
 import cc.openhome.class2.ArrayList2;
 import cc.openhome.class2.Clerk2;
 import cc.openhome.class2.Consumer2;
+import cc.openhome.class2.DirectExecutor;
+import cc.openhome.class2.Pages;
 import cc.openhome.class2.Producer2;
 import cc.openhome.class2.Clerk3;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;;
 public class MyClass2 {
 	// Lock、ReadWriteLock 与 Condition
 	public static void exp1() {
@@ -161,9 +169,127 @@ public class MyClass2 {
 		 * 
 		 * 如何建立Thread、是否重用Thread、何时销毁Thread、被指定的Runable何时排给Thread执行，这些都是复杂的议题。
 		 * 为此，从JDK5开始，定义了 java.util.concurrent.Execute接口，
+		 * 
 		 * 目的是将 Runnable的指定与实际如何执行分离。
 		 * 
 		 * Execute接口只定义了一个 execute()方法。
+		 * 
+		 * 例子：将11.1.3节中的Download 与 Download2封装起来。
 		 * */
+//		download();
+		
+		/* 使用 DirectExecutor实现Executor接口，调用传入的execute()方法
+		 * 上面还是单纯使用主线程执行指定的每个页面下载。
+		 * 
+		 * 如果定义一个 ThreadPerTaskExecutor：对于每个传入的Runnable对象，会建立一个实例并执行start()执行。
+		 * 如果这样使用Pages:
+		 * */
+//		download2();
+		
+		/* 那么针对每个网页，会启动一个线程来进行下载。
+		 * 或许你会想到，若要下载的页面非常多，每次建立一个线程下载页面完后，
+		 * 就丢弃该线程过于浪费系统资源。也许你会想到操作一个具有线程池的 Executor，
+		 * 建立可重复使用的线程，这是可行的。
+		 * 不过不用亲自操作，因为 Java SE API中提供有接口与操作类，可达到此类要求。
+		 * */
+		
+		exp2_1();
+	}
+	public static void download() {
+		URL[] urls = null;
+		try {
+			URL[] urls2 = {
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/projects"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/wiki")
+			};
+			urls = urls2;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+			
+		String[] fileNames = {
+			"issues2.html",
+			"pulls2.html",
+			"projects2.html",
+			"wiki2.html"
+		};
+		new Pages(urls, fileNames, new DirectExecutor()).download();
+	}
+	public static void download2() {
+		URL[] urls = null;
+		try {
+			URL[] urls2 = {
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/projects"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/wiki")
+			};
+			urls = urls2;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+			
+		String[] fileNames = {
+			"issues3.html",
+			"pulls3.html",
+			"projects3.html",
+			"wiki3.html"
+		};
+		new Pages(urls, fileNames, new ThreadPerTaskExecutor()).download();
+	}
+	// 线程池
+	public static void exp2_1() {
+		/* <1>.使用ThreadPoolExecutor*/
+		ThreadPoolExecutor();
+	}
+	public static void ThreadPoolExecutor() {
+		/* <1>.使用ThreadPoolExecutor
+		 * 
+		 * 在Java SE API中，像线程池这类服务的行为，实际上是定义在 Executor的子接口
+		 * java.util.concurrent.ExecutorService中。
+		 * 
+		 * 通用的ExecutorService由抽象类 AbstractExecutorService操作。如果需要线程池的功能，则可以使用其子类
+		 * java.util.concurrent.ThreadPoolExecutor。
+		 * 
+		 * 根据不同的线程池要求，ThreadPoolExecutor又有数种不同构造函数可共使用。
+		 * 不过通常会使用:
+		 * newCachedThreadPool()、
+		 * newFixedThreadPool()静态方法来创建 ThreadPoolExecutor实例，程序看起来清楚。
+		 * 
+		 * newCachedThreadPool返回的实例，会在必要时建立线程，你的 Runnable可能执行在新建的线程，或是重复利用的线程中。
+		 * newFixedThreadPool则可指定在池中建立固定数量的线程。
+		 * 
+		 * 
+		 * 例子：在ThreadPoolExecutor搭配前面的Pages使用:
+		 * 
+		 * */
+	}
+	public static void download3() {
+		URL[] urls = null;
+		try {
+			URL[] urls2 = {
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/projects"),
+					new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/wiki")
+			};
+			urls = urls2;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+			
+		String[] fileNames = {
+			"issues3.html",
+			"pulls3.html",
+			"projects3.html",
+			"wiki3.html"
+		};
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		new Pages(urls, fileNames, executorService).download();
+		// 会在指定执行的 Runnable都完成后，将ExecutorService关闭（在这里就是关闭ThreadPoolExecutor）
+		// 还有另一个 shutdownNow()方法，则可以立即关闭 ExecutorService，尚未执行的Runnable对象会以 List<Runnable>返回
+		executorService.shutdown();
 	}
 }
