@@ -14,6 +14,7 @@ public class Main {
 		 * 从JDK5之后提供了 java.util.concurrent包，可基于其中的API建立更稳固的并行应用程序。
 		 * */
 		MyClass2.exp1(); // 11.2.1 Lock、ReadWriteLock 与 Condition
+		MyClass2.exp2(); // 11.2.2 使用 Executor
 	}
 	/* ********************11.1 线程******************** */
 	public static void exp1() {

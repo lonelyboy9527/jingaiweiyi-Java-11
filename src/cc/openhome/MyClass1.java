@@ -555,7 +555,6 @@ public class MyClass1 {
 		 * 	若此时t2正好也调用 resource2.cooperate(resource);，会取得resource2的锁定，
 		 * 凑巧t1现在打算运用传入的resource2调用 doSome()，理应取得resource2的锁定，但锁定现在被t2
 		 * 拿走了，于是t1进入阻断，而t2也打算运用传入的resource调用doSome()，理应取得resource的锁定
-		 * 
 		 * 但锁定现在是t1取走，于是t2也进入等待。 
 		 * 
 		 * Java在死结发生时，陷入停顿状态，所以必须避免 

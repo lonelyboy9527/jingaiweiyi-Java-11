@@ -20,7 +20,7 @@ public class Clerk {
 		}
 		this.product = product; // 店员收货
 		System.out.printf("生产者设定 (%d)\n", this.product);
-		notify(); // 通知等待集合中的线程（例如消费者Consumer）
+		notify(); // 通知等待集合中的线程（例如消费者Consumer线程）
 	}
 	
 	public synchronized int getProduct() {
@@ -35,7 +35,7 @@ public class Clerk {
 		int  p = this.product; // 准备交换
 		System.out.printf("消费者取走 (%d)\n", this.product);
 		this.product = -1; // 表示产品被取走
-		notify(); // 通知等待集合中的线程(例如生产者Producer)
+		notify(); // 通知等待集合中的线程(例如生产者Producer线程)
 		return p; // 交货
 	}
 }
