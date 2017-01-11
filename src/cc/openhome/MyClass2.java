@@ -9,13 +9,16 @@ import cc.openhome.class2.ArrayList2;
 import cc.openhome.class2.Clerk2;
 import cc.openhome.class2.Consumer2;
 import cc.openhome.class2.DirectExecutor;
+import cc.openhome.class2.FutureCallable;
 import cc.openhome.class2.Pages;
 import cc.openhome.class2.Producer2;
 import cc.openhome.class2.Clerk3;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;;
 public class MyClass2 {
 	// Lock、ReadWriteLock 与 Condition
 	public static void exp1() {
@@ -179,7 +182,7 @@ public class MyClass2 {
 //		download();
 		
 		/* 使用 DirectExecutor实现Executor接口，调用传入的execute()方法
-		 * 上面还是单纯使用主线程执行指定的每个页面下载。
+		 * 上面还是单纯使用 主线程 执行指定的每个页面下载。
 		 * 
 		 * 如果定义一个 ThreadPerTaskExecutor：对于每个传入的Runnable对象，会建立一个实例并执行start()执行。
 		 * 如果这样使用Pages:
@@ -258,13 +261,47 @@ public class MyClass2 {
 		 * newCachedThreadPool()、
 		 * newFixedThreadPool()静态方法来创建 ThreadPoolExecutor实例，程序看起来清楚。
 		 * 
-		 * newCachedThreadPool返回的实例，会在必要时建立线程，你的 Runnable可能执行在新建的线程，或是重复利用的线程中。
-		 * newFixedThreadPool则可指定在池中建立固定数量的线程。
+		 * 通过newCachedThreadPool返回的实例，会在必要时建立线程，你的 Runnable可能执行在新建的线程，或是重复利用的线程中。
+		 * 通过newFixedThreadPool则可指定在池中建立固定数量的线程。
 		 * 
 		 * 
 		 * 例子：在ThreadPoolExecutor搭配前面的Pages使用:
-		 * 
 		 * */
+//		download3();
+		
+		/* ExecutorService还定义了 submit()、invokeAll()、invokeAny()等方法，
+		 * 这些方法中出现了 java.util.concurrent.Future、java.util.concurrent.Callable接口。
+		 * 
+		 * Future:就是让你将来取得结果，你可以将要执行的工作交给Future，
+		 * 		Future会使用另一个线程来进行工作，你就可以先忙别的事去了。
+		 * 		过些时候，再调用Future的get()取得结果，如果结果已经产生，get()会直接返回，否则会进入阻断直到结果返回。
+		 * 		get()的另一个版本则可以指定等待时间。(到时间还没有产生，则抛出异常)，也可使用 isDone()看看结果是否产生。
+		 * Future经常与Callable搭配使用
+		 * 
+		 * Callable的作用与 Runnable相似，可让你定义想要执行的流程，
+		 * 			不过Runnable的run方法无法返回值，也无法抛出受检异常。
+		 * 			而Callable的call()方法可以返回值，也可以抛出受检异常。
+		 * 
+		 * 举个例子：Future与Callable运用的实例，在未来某个时间获取 斐波那契数字
+		 * */
+		FutureTask<Long> fib30 = new FutureTask<> (
+			new Callable<Long>() {
+				public Long call() {
+					return FutureCallable.fibonacci(30);
+				}
+			}
+		);
+		System.out.println("老板，我要第 30 个费式数，待会来拿......");
+		new Thread(fib30).start();
+		System.out.println("忙别的事去......");
+		try {
+			Thread.sleep(5000);
+			System.out.printf("第 30 个费式数: %d\n", fib30.get());
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+				
 	}
 	public static void download3() {
 		URL[] urls = null;
@@ -289,6 +326,7 @@ public class MyClass2 {
 		ExecutorService executorService = Executors.newCachedThreadPool();
 		new Pages(urls, fileNames, executorService).download();
 		// 会在指定执行的 Runnable都完成后，将ExecutorService关闭（在这里就是关闭ThreadPoolExecutor）
+		
 		// 还有另一个 shutdownNow()方法，则可以立即关闭 ExecutorService，尚未执行的Runnable对象会以 List<Runnable>返回
 		executorService.shutdown();
 	}
