@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import cc.openhome.class1.Clerk;
+import cc.openhome.class1.Consumer;
 import cc.openhome.class1.Hare;
 import cc.openhome.class1.HareThread;
 import cc.openhome.class1.Some;
@@ -16,6 +18,7 @@ import cc.openhome.class1.Tortoise;
 import cc.openhome.class1.TortoiseThread;
 import cc.openhome.class1.Material;
 import cc.openhome.class1.MySome;
+import cc.openhome.class1.Producer;
 import cc.openhome.class1.Resource;
 import cc.openhome.class1.Variable;
 import cc.openhome.class1.Variable2;
@@ -690,7 +693,9 @@ public class MyClass1 {
 		 * 例子：以下是正确使用 volatile的例子:
 		 * */
 		MySome mySome = new MySome();
-		
+		/* 可以在 t2调用stop()方法设定isContinue时，
+		 * t1实时在下次while条件检查时看到 t2的变更。
+		 *  */
 	}
 	public static void VariableTest() {
 		System.out.println("VariableTest...");
@@ -761,4 +766,36 @@ public class MyClass1 {
 		t1.start();
 		t2.start();
 	}
+	// 等待与通知
+	public static void exp6() {
+		/* wait()、notify()、notifyall()是 Object定义的方法，
+		 * 可以通过这三个方法控制线程释放对象的锁定，或者通知线程参与锁定竞争。
+		 * 
+		 * 线程要进入 synchronized范围前，要先取得指定对象的锁定。执行synchronized范围的程序代码期间，
+		 * 
+		 * wait():
+		 * 若调用锁定对象的wait()方法，线程会释放对象锁定，并进入对象等待集合而处于阻断状态，其他线程可以
+		 * 竞争对象锁定，取得锁定的线程可以执行synchronized范围的程序代码。
+		 * 放在等待集合的线程不会参与CPU排班，wait()可以指定等待时间，时间到之后线程再次进入排班。
+		 * （如果指定时间为0或不指定，则线程会持续等待，直到被中断（调用interrupt()或者告知notify()），则可以参与CPU排班）
+		 * 
+		 * notify():
+		 * 被竞争锁定的对象调用 notify()时，会从对象等待集合中随机通知一个线程加入排班，
+		 * 再次执行synchronized前，被通知的线程会与其他线程共同竞争对象锁定。
+		 * 
+		 * 如果调用notifyAll()，所有等待集合中的现象都会被通知参与排班，这些线程会与其他线程共同竞争对象锁定。
+		 * 
+		 * 简单来说：线程调用对象 wait()方法时，会先让出 synchronized区块使用权并等待通知，
+		 * 			或是等待指定时间，直到被 notify()或时间到时，再从调用wait()处开始执行。（就像来面试，面试等待通知或者到一定时间可以进去面试了）。
+		 * 
+		 * 例子：假设生产者每次生产一个int型整数交给店员，消费者再从店员处获取产品。
+		 * */
+		Clerk clerk = new Clerk();
+		new Thread(new Producer(clerk)).start();
+		new Thread(new Consumer(clerk)).start();
+		/* 生产者会生产 10 个整数，而消费者会消耗 10 个整数
+		 * 虽然生产与消耗速度不一样，由于店员处只能放置一个整数，所以只能每生产一个才消耗一个。
+		 * */
+	}
+	
 }
