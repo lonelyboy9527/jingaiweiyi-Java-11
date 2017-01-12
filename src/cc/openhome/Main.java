@@ -5,7 +5,13 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 //		exp1();
-		exp2();
+//		exp2();
+		exp3();
+	}
+	/* ********************11.3 并行Collection简介******************** */
+	public static void exp3() {
+		/* */
+		MyClass3.exp1(); // 
 	}
 	/* ********************11.2 并行API******************** */
 	public static void exp2() {

@@ -527,6 +527,13 @@ public class MyClass2 {
 		 * 例子：写个文档搜索的程序：
 		 * */
 		RecursiveAction();
+		
+		/* 在逐一取得文件夹路径信息时，如果是文件夹就先分解为查询文件夹的子任务。
+		 * 		如果是文档就比较是否符合搜索条件，是的话就显示在控制台中。
+		 * 
+		 * 最后调用ForkJoinTask的invokeAll()方法，ForkJoinPool会为每个查询子文件夹的子任务
+		 * 		分配线程进行运算。
+		 * */
 	}
 	public static void RecursiveTask() {
 		System.out.println("RecursiveTask -> 操作ForkJoinTask的子类RecursiveTask抽象类实现分而治之");
@@ -538,7 +545,7 @@ public class MyClass2 {
 		System.out.println("RecursiveAction -> 操作ForkJoinTask的子类RecursiveAction抽象类，针对子任务没有返回值的情况");
 		
 		ForkJoinPool mainPool = new ForkJoinPool();
-//		SubDir subDir = new SubDir(Paths.get(args[0]), args[1]);
-//		mainPool.invoke(subDir);
+		SubDir subDir = new SubDir(Paths.get("/Users/yunshang/Desktop"), ".rtf");
+		mainPool.invoke(subDir);
 	}
 }

@@ -10,8 +10,8 @@ import java.util.List;
 
 public class SubDir extends RecursiveAction { // 继承自RecursiveAction
 
-	Path path;
-	String pattern;
+	Path path; // 地址
+	String pattern; // 文件后缀名
 	
 	public SubDir(Path path, String pattern) {
 		// TODO Auto-generated constructor stub
@@ -27,9 +27,11 @@ public class SubDir extends RecursiveAction { // 继承自RecursiveAction
 				if (Files.isDirectory(subPath)) { // 如果是文件夹，分解为子任务收集起来，线程来执行这个子任务。
 					subDirs.add(new SubDir(subPath, pattern));
 				} else if (subPath.toString().endsWith(pattern)) { // 如果是文档，看看是否符搜素条件
+					// 没有下一级文件夹，匹配后缀，如果是，直接打印
 					System.out.println(subPath.toString());
 				}
 			}
+			// ForkJoinPool会为每个查询子文件夹的子任务分配线程进行运算
 			ForkJoinTask.invokeAll(subDirs); // 执行所有子任务，所有子任务完成后返回
 		} catch (Exception e) {
 			// TODO: handle exception
