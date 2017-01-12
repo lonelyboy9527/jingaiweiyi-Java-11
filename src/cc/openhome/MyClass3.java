@@ -29,9 +29,29 @@ public class MyClass3 {
 		 * 
 		 * 例子：
 		 * */
+		BlockingQueue();
+		
+		
+		/* ConcurrentMap 是Map的子接口，其定义了 putIfAbsent()、remove()与 replace()等方法。
+		 * 这些方法都是 原子（Atomic）操作。
+		 * 
+		 * putIfAbsent()：在键对象不存在 ConcurrentMap中时，才可置入键/值对象，否则返回键对应的值对象。
+		 * remove()：只有在键对象存在，且对应的值对象等于指定的值对象，才将键/值对象移除。
+		 * replace()：两个版本：一个版本是 只有键对象存在，且对应的值对象等于指定的值对象，才将值对象置换。
+		 * 					另一个版本：是在键对象存在时，将值对象置换。
+		 * 
+		 * 扩展：
+		 * ConcurrentHashMap是 ConcurrentMap的操作类，
+		 * ConcurrentNavigableMap是 ConcurrentMap子接口，其操作类为 ConcurrentSkipListMap，可视为支持并行操作的 TreeMap版本。
+		 * */
+		
+	} 
+	public static void BlockingQueue() {
+		System.out.println("BlockingQueue -> 多线程的队列的存取操作");
 		BlockingQueue queue = new ArrayBlockingQueue(1);// 设置容量为1
 		new Thread(new Producer3(queue)).start();
 		new Thread(new Consumer3(queue)).start();
 		
-	} 
+		/* BlockingQueue还有其他操作，以及BlockingQueue子接口及相关操作类。*/
+	}
 }
