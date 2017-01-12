@@ -180,7 +180,7 @@ public class MyClass2 {
 	}
 	
 	// 使用 Executor
-	public static void exp2(String[] args) {
+	public static void exp2() {
 		System.out.println("Executor -> 目的是将 Runnable的指定与实际如何执行分离");
 		/* Runnale用来定义可执行流程与可使用数据， Thread用来执行Runnale。
 		 * 两者结合的基本做法正如前面介绍的，将Runnale指定给Thread创建之用，并调用start()开始执行。
@@ -211,7 +211,7 @@ public class MyClass2 {
 		 * 不过不用亲自操作，因为 Java SE API中提供有接口与操作类，可达到此类要求。
 		 * */
 		
-		exp2_1(args);
+		exp2_1();
 	}
 	public static void download() {
 		System.out.println("download -> 使用 Executor的 execute()方法执行 run()");
@@ -260,7 +260,7 @@ public class MyClass2 {
 		new Pages(urls, fileNames, new ThreadPerTaskExecutor()).download();
 	}
 	// 线程池
-	public static void exp2_1(String[] args) {
+	public static void exp2_1() {
 		System.out.println("在多线程中 -> 通过线程池管理线程");
 		/* <1>.使用ThreadPoolExecutor*/
 //		ThreadPoolExecutor();
@@ -269,7 +269,7 @@ public class MyClass2 {
 //		ScheduledThreadPoolExecutor();
 		
 		/* <3>.使用ForkJoinPool*/
-		ForkJoinPool(args);
+		ForkJoinPool();
 	}
 	public static void ThreadPoolExecutor() {
 		System.out.println("ThreadPoolExecutor -> 通过ExecutorService的子接口ThreadPoolExecutor来实现线程池功能");
@@ -486,7 +486,7 @@ public class MyClass2 {
 		
 	}
 	
-	public static void ForkJoinPool(String[] args) {
+	public static void ForkJoinPool() {
 		System.out.println("ForkJoinPool -> 结合多线程将问题分而治之");
 		/* <3>.使用ForkJoinPool
 		 * 
@@ -526,7 +526,7 @@ public class MyClass2 {
 		 * 如果分而治之的过程中，子任务不需要返回值，可以继承 RecursiveAction并操作 compute()方法。
 		 * 例子：写个文档搜索的程序：
 		 * */
-		RecursiveAction(args);
+		RecursiveAction();
 	}
 	public static void RecursiveTask() {
 		System.out.println("RecursiveTask -> 操作ForkJoinTask的子类RecursiveTask抽象类实现分而治之");
@@ -534,12 +534,11 @@ public class MyClass2 {
 		ForkJoinPool mainPool = new ForkJoinPool();
 		System.out.println(mainPool.invoke(fibonacci)); // 开始分而治之
 	}
-	public static void RecursiveAction(String[] args) {
+	public static void RecursiveAction() {
 		System.out.println("RecursiveAction -> 操作ForkJoinTask的子类RecursiveAction抽象类，针对子任务没有返回值的情况");
 		
 		ForkJoinPool mainPool = new ForkJoinPool();
-		Path path = 
-		SubDir subDir = new SubDir(Paths.get(args[0]), args[1]);
-		mainPool.invoke(subDir);
+//		SubDir subDir = new SubDir(Paths.get(args[0]), args[1]);
+//		mainPool.invoke(subDir);
 	}
 }
