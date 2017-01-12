@@ -169,7 +169,7 @@ public class MyClass1 {
 		thread.start();
 	}
 	public static void exp3_2() {
-		System.out.println("exp3_2 -> Thread基本状态图");
+		System.out.println("exp3_2 -> Thread基本状态图 (可执行(Runnable)、被阻断(Blocked)、执行中(Running)、Dead状态(执行完成))");
 		/* <2>.Thread基本状态图
 		 * 
 		 * 在调用Thread实例start()方法之后，基本状态为可执行(Runnable)、被阻断(Blocked)、执行中(Running)。
