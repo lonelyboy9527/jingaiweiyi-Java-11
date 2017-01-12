@@ -32,6 +32,7 @@ import java.util.concurrent.ForkJoinPool;
 public class MyClass2 {
 	// Lock、ReadWriteLock 与 Condition
 	public static void exp1() {
+		System.out.println("exp1 -> Lock、ReadWriteLock 与 Condition");
 		/* synchronized 要求线程必须取得对象锁定，才可执行所标示的区块范围
 		 * 然而使用synchronized 有许多限制，未取得锁定的线程会直接被阻断。
 		 * 
@@ -181,6 +182,7 @@ public class MyClass2 {
 	
 	// 使用 Executor
 	public static void exp2() {
+		System.out.println("exp2 -> 使用 Executor");
 		System.out.println("Executor -> 目的是将 Runnable的指定与实际如何执行分离");
 		/* Runnale用来定义可执行流程与可使用数据， Thread用来执行Runnale。
 		 * 两者结合的基本做法正如前面介绍的，将Runnale指定给Thread创建之用，并调用start()开始执行。

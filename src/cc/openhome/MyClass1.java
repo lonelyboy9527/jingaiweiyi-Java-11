@@ -26,6 +26,7 @@ import cc.openhome.class1.Variable3;
 public class MyClass1 {
 	// 线程简介
 	public static void exp1() {
+		System.out.println("exp1 -> 线程简介");
 		/* 如果要设计一个龟兔赛跑游戏
 		 * 赛程长度为10步，每经过一秒，乌龟会前进一步，兔子则可能前进两步或睡觉，那该怎么设计呢？
 		 * 
@@ -60,6 +61,7 @@ public class MyClass1 {
 		
 	}
 	public static void run() {
+		System.out.println("龟兔赛跑 -> 主线程中");
 		// 龟兔赛跑
 		try {	
 			boolean[] flags = {true, false};
@@ -90,6 +92,7 @@ public class MyClass1 {
 	}
 	// Thread 与Runnable
 	public static void exp2() {
+		System.out.println("exp2 -> Thread 与Runnable，类实现Runnable接口");
 		/* 从抽象观点的开发者角度看， JVM是台虚拟计算机，
 		 * 只安装一颗称为主线程的CPU，可执行main()定义的执行流程。
 		 * 
@@ -124,11 +127,12 @@ public class MyClass1 {
 	
 	// 线程生命周期
 	public static void exp3() {
+		System.out.println("exp3 -> 线程生命周期");
 		/* 线程的生命周期颇为复杂，下面将从最简单的开始介绍
 		 * */
 		
 		/* <1>.Daemon 线程*/
-//		exp3_1();
+//		Daemon();
 		
 		/* <2>.Thread基本状态图*/
 //		exp3_2();
@@ -139,7 +143,8 @@ public class MyClass1 {
 		/* <4>.停止线程*/
 		exp3_4();
 	}
-	public static void exp3_1() {
+	public static void Daemon() {
+		System.out.println("Daemon -> Daemon线程");
 		/* <1>.Daemon 线程
 		 * 
 		 * 主线程会从main()方法开始执行，直到main()方法结束后停止 JVM。
@@ -149,7 +154,7 @@ public class MyClass1 {
 		 * 
 		 * 从main()方法开始的就是一个非Daemon线程，可以使用setDaemon()方法来设定一个线程是否为Daemon线程。
 		 * 例子：
-		 * 下面的 例子如果没有 setDaemon设定为true，则程序会不断的输出 "Orz"而不终止;
+		 * 下面的 例子如果没有设置setDaemon设定为true，则程序会不断的输出 "Orz"而不终止;
 		 * 使用isDaemon()方法可以判断线程是否为Daemon线程。
 		 * */
 		System.out.println("Daemon线程");
@@ -164,6 +169,7 @@ public class MyClass1 {
 		thread.start();
 	}
 	public static void exp3_2() {
+		System.out.println("exp3_2 -> Thread基本状态图");
 		/* <2>.Thread基本状态图
 		 * 
 		 * 在调用Thread实例start()方法之后，基本状态为可执行(Runnable)、被阻断(Blocked)、执行中(Running)。
@@ -208,8 +214,17 @@ public class MyClass1 {
 		 * */
 		Interrupted();
 	}
+	public static void dump(InputStream src, OutputStream dest) throws IOException{
+		try (InputStream input = src; OutputStream output = dest) {
+			byte[] data = new byte[1024];
+			int length = -1;
+			while ((length = input.read(data)) != -1) {
+				output.write(data, 0, length);
+			}
+		}
+	}
 	public static void Download() throws Exception {
-		System.out.println("执行Download");
+		System.out.println("Download -> 主线程中下载");
 		URL[] urls = {
 			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
 			new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
@@ -228,7 +243,7 @@ public class MyClass1 {
 		}
 	}
 	public static void Download2() throws Exception {
-		System.out.println("执行Download2");
+		System.out.println("Download2 -> 使用多线程并行下载");
 		URL[] urls = {
 				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/issues"),
 				new URL("https://github.com/lonelyboy9527/jingaiweiyi-Java-11/pulls"),
@@ -261,6 +276,7 @@ public class MyClass1 {
 		}
 	}
 	public static void Interrupted() {
+		System.out.println("Interrupted -> 使线程离开阻塞状态");
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
@@ -274,9 +290,10 @@ public class MyClass1 {
 			}
 		};
 		thread.start();
-		thread.interrupt();
+		thread.interrupt(); // 主线程中，调用thread线程的interrupt方法，能够是线程退出阻塞状态
 	}
 	public static void exp3_3() {
+		System.out.println("exp3_3 -> 安插线程，B线程使用join()加入A线程中");
 		/* <3>.安插线程
 		 * 
 		 * 如果线程A正在运行，流程中允许B线程加入，等到B线程执行完毕后再继续A线程流程
@@ -288,6 +305,7 @@ public class MyClass1 {
 		join();
 	}
 	public static void join() {
+		System.out.println("join -> 安插线程");
 		System.out.println("Main thread 开始...");
 		Thread threadB = new Thread() {
 			@Override
@@ -322,6 +340,7 @@ public class MyClass1 {
 		System.out.println("Main thread 将结束...");
 	}
 	public static void exp3_4() {
+		System.out.println("exp3_4 -> 停止线程，stop()方法已经停用，需要通过其他方法自行停止线程");
 		/* <4>.停止线程
 		 * 线程执行完 run()后，就会进入Dead，进入Dead()的线程不可以再调用start()方法，否则
 		 * 会抛出IllegalThreadStateException
@@ -346,18 +365,9 @@ public class MyClass1 {
 		some.stop();
 	}
 	
-	public static void dump(InputStream src, OutputStream dest) throws IOException{
-		try (InputStream input = src; OutputStream output = dest) {
-			byte[] data = new byte[1024];
-			int length = -1;
-			while ((length = input.read(data)) != -1) {
-				output.write(data, 0, length);
-			}
-		}
-	}
-	
 	// 关于ThreadGroup
 	public static void exp4() {
+		System.out.println("exp4 -> ThreadGroup，线程组");
 		/* 每个线程都属于一个线程群组（ThreadGroup）
 		 * 若在main()主流程中产生一个线程，该线程会属于main线程群组。
 		 * 
@@ -410,6 +420,7 @@ public class MyClass1 {
 		 * */
 	}
 	public static void threadGroupDemo() {
+		System.out.println("threadGroupDemo -> 线程组通过uncaughtException()方法，捕获组中某个线程发生的异常");
 		ThreadGroup tg1 = new ThreadGroup("tg1") {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
@@ -437,6 +448,7 @@ public class MyClass1 {
 		t1.start();		
 	}
 	public static void threadGroupDemo2() {
+		System.out.println("threadGroupDemo2 -> 自行设置 setUncaughtExceptionHandler，处理组中某个线程发生的异常。");
 		ThreadGroup tg1 = new ThreadGroup("tg1"); 
 		Thread t1 = new Thread(tg1, new Runnable() {
 			@Override
@@ -467,6 +479,7 @@ public class MyClass1 {
 	}
 	// synchronized与volatile
 	public static void exp5() {
+		System.out.println("exp5 -> synchronized与volatile");
 		/* 还记得以前自己开发过 ArrayList类吗？
 		 * 在没有接触线程前，也就是将那个ArrayList用在主线程的环境中，没有什么问题，
 		 * 如果同时使用在两个以上的线程，会如何？
@@ -488,7 +501,7 @@ public class MyClass1 {
 		exp5_2();
 	}
 	public static void ArrayListDemo() {
-		System.out.println("ArrayListDemo");
+		System.out.println("ArrayListDemo -> 多个线程存取访问ArrayList，出现的异常");
 		final ArrayList<Integer> list = new ArrayList<Integer>();
 		Thread t1 = new Thread() {
 			@Override
@@ -512,6 +525,7 @@ public class MyClass1 {
 		t2.start();
 	}
 	public static void exp5_1() {
+		System.out.println("exp5_1 -> 使用synchronized访问");
 		/* <1>.使用synchronized
 		 * 
 		 * 可以在add()方法上加上 synchronized关键字。
@@ -562,7 +576,7 @@ public class MyClass1 {
 	}
 	
 	public static void exp5_1_1() {
-		System.out.println("exp5_1_1 -> synchronized");
+		System.out.println("exp5_1_1 -> synchronized操作访问 ArrayList");
 		final ArrayList<Integer> list = new ArrayList<Integer>();
 		Thread t1 = new Thread() {
 			@Override
@@ -593,7 +607,7 @@ public class MyClass1 {
 		t2.start();
 	}
 	public static void exp5_1_2() {
-		System.out.println("exp5_1_2 -> synchronizedList");
+		System.out.println("exp5_1_2 -> 直接使用对应的同步list访问，synchronizedList");
 		List<String> list2 = new ArrayList<String>();
 		synchronized (list2) {
 			list2.add("...");
@@ -617,7 +631,7 @@ public class MyClass1 {
 		 * */
 	}
 	public static void Resource() {
-		System.out.println("Resource -> 死结");
+		System.out.println("Resource -> synchronized造成的死结");
 		final Resource resource = new Resource("哈哈哈", 10);
 		final Resource resource2 = new Resource("嘻嘻嘻", 20);
 		Thread t1 = new Thread() {
@@ -644,6 +658,7 @@ public class MyClass1 {
 	}
 	
 	public static void exp5_2() {
+		System.out.println("exp5_2 -> 使用volatile");
 		/* <2>.使用volatile
 		 * 
 		 * synchronized要求达到的所标示区块的互斥性与可见性，
@@ -677,7 +692,7 @@ public class MyClass1 {
 		 * 
 		 * 将i和j声明为 volatile
 		 * */
-		VariableTest3();
+//		VariableTest3();
 		/* 注意，虽然这样改过了，但是可能还是会出现j>i的情况，但是减少很多。
 		 * 
 		 * 使用了volatile标示保证的是单一数的可见性，线程对变量的存取一定是在  <共享内存中> ，
@@ -685,8 +700,8 @@ public class MyClass1 {
 		 * 
 		 * 注意，实际上，想一定使得 i == j，那么还是采用第二种方法，
 		 * 因为采用volatile只保证 t1对 i 或者j变量值的设定，t2一定可见，
-		 * one()中包括了i++, j++两个描述，要保证这两个描述执行完，本来就该用synchronized，t
-		 * wo()中包括了取得i,j变量值及执行 System.out.printf()等动作，要保证这些描述执行完，也是synchronized的职责。
+		 * one()中包括了i++, j++两个描述，要保证这两个描述执行完，本来就该用synchronized，
+		 * two()中包括了取得i,j变量值及执行 System.out.printf()等动作，要保证这些描述执行完，也是synchronized的职责。
 		 * 
 		 * 
 		 * 例子：以下是正确使用 volatile的例子:
@@ -697,7 +712,7 @@ public class MyClass1 {
 		 *  */
 	}
 	public static void VariableTest() {
-		System.out.println("VariableTest...");
+		System.out.println("VariableTest -> 多个线程存取同一变量，造成数据不准确");
 		Thread t1 = new Thread() {
 			@Override
 			public void run() {
@@ -720,7 +735,7 @@ public class MyClass1 {
 		t2.start();
 	}
 	public static void VariableTest2() {
-		System.out.println("VariableTest2...");
+		System.out.println("VariableTest2 -> 使用synchronized解决多个线程存取同一变量，造成数据不准确的问题，但是会造成速度下降");
 		Thread t1 = new Thread() {
 			@Override
 			public void run() {
@@ -743,7 +758,7 @@ public class MyClass1 {
 		t2.start();
 	}
 	public static void VariableTest3() {
-		System.out.println("VariableTest3...");
+		System.out.println("VariableTest3 -> 使用 volatile标示多个线程访问的变量");
 		Thread t1 = new Thread() {
 			@Override
 			public void run() {
@@ -767,6 +782,7 @@ public class MyClass1 {
 	}
 	// 等待与通知
 	public static void exp6() {
+		System.out.println("exp6 -> 等待与通知");
 		/* wait()、notify()、notifyall()是 Object定义的方法，
 		 * 可以通过这三个方法控制线程释放对象的锁定，或者通知线程参与锁定竞争。
 		 * 
@@ -789,6 +805,7 @@ public class MyClass1 {
 		 * 
 		 * 例子：假设生产者每次生产一个int型整数交给店员，消费者再从店员处获取产品。
 		 * */
+		System.out.println("一个生产者和消费者的例子");
 		Clerk clerk = new Clerk();
 		new Thread(new Producer(clerk)).start();
 		new Thread(new Consumer(clerk)).start();
