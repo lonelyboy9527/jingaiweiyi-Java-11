@@ -5,8 +5,8 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 //		exp1();
-//		exp2();
-		exp3();
+		exp2();
+//		exp3();
 	}
 	/* ********************11.3 并行Collection简介******************** */
 	public static void exp3() {

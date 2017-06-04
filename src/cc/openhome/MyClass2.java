@@ -134,8 +134,8 @@ public class MyClass2 {
 		 * 可以使用readLock()、writeLock()方法返回Lock操作对象。
 		 * 
 		 * ReentrantReadWriteLock是ReadWriteLock接口主要操作类，
-		 * readLock方法会返回ReentrantReadWriteLock.readLock实例，调用其Lock()方法时，若没有任何写入锁定时，可以取的读取锁定。
-		 * writeLock方法会返回ReentrantReadWriteLock.writeLock实例，调用其Lock()方法时，若没有任何读取或者写入锁定时，才可以取得写入锁定。
+		 * readLock方法会返回ReentrantReadWriteLock.readLock实例，调用其Lock()方法时，若 没有任何写入锁定(没有线程对对象进行写操作) 时，可以取的读取锁定。
+		 * writeLock方法会返回ReentrantReadWriteLock.writeLock实例，调用其Lock()方法时，若 没有任何读取或者写入锁定 时，才可以取得写入锁定。
 		 * 
 		 * 例子：使用ReadWriteLock改写前面对ArrayList，改进读取效率
 		 * */

@@ -349,12 +349,12 @@ public class MyClass1 {
 		/* Thread类定义有 stop()方法，不过被标示为 Deprecated（表示过去确实定义过，后来因为引发某些问题
 		 * 为了确保兼容性，这些API没有直接剔除，但不建议再使用它），
 		 * 
-		 * 如果使用Deprecated标示的 API，变异程序会剔除警告，而在IDE中，通常会出现删除线表示不建议使用。
+		 * 如果使用Deprecated标示的 API，编译程序会提出警告，而在IDE中，通常会出现删除线表示不建议使用。
 		 * 为什么最新的API不建议使用stop()方法？
 		 * 	因为直接调用stop()方法，将不会理会所设定的释放、取得锁流程，线程会直接释放所有已锁定对象（锁定后面谈），
 		 * 这有可能使对象陷入无法预期状态，
 		 * 
-		 * 除了stop()方法，Thread的 resume()、suspend()、destroy()等方法也不建议使用。
+		 * 除了 停止 stop()方法，Thread的 继续 resume()、挂起 suspend()、摧毁 destroy()等方法也不建议使用。
 		 * 
 		 * 如果要停止线程，最后自行操作，让线程跑完所有的流程
 		 * 例子：
@@ -559,7 +559,7 @@ public class MyClass1 {
 		/* Java的synchronized提供的是可重入同步(Reentrant synchronized)，也就是线程取得某个对象后，
 		 * 若执行过程中又要执行synchronized，尝试取得锁定的对象来源又是同一个，则可直接执行。
 		 * 
-		 * 注意：synchronized使用不当会造成 死结
+		 * 注意：synchronized 使用不当 会造成死结
 		 * 例子：
 		 * */ 
 		Resource();
@@ -692,7 +692,7 @@ public class MyClass1 {
 		 * 
 		 * 将i和j声明为 volatile
 		 * */
-//		VariableTest3();
+		VariableTest3();
 		/* 注意，虽然这样改过了，但是可能还是会出现j>i的情况，但是减少很多。
 		 * 
 		 * 使用了volatile标示保证的是单一数的可见性，线程对变量的存取一定是在  <共享内存中> ，

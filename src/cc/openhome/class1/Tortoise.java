@@ -17,6 +17,7 @@ public class Tortoise implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		System.out.println("------> 乌龟跑步开始:");
 		try {
 			while (step < totalStep) {
 				Thread.sleep(1000);
