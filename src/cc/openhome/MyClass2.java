@@ -321,7 +321,7 @@ public class MyClass2 {
 		 * 
 		 * 例如，改写以上的范例为使用 ExecutorService的版本：
 		 * */
-		FutureCallable2();
+//		FutureCallable2();
 		/* 范例中的执行结果与上个例子相同。
 		 * 
 		 * 如果有多个Callable，可以先收集为 Collection中，然后调用 ExecutorService的
@@ -547,7 +547,7 @@ public class MyClass2 {
 		System.out.println("RecursiveAction -> 操作ForkJoinTask的子类RecursiveAction抽象类，针对子任务没有返回值的情况");
 		
 		ForkJoinPool mainPool = new ForkJoinPool();
-		SubDir subDir = new SubDir(Paths.get("/Users/yunshang/Desktop"), ".rtf");
+		SubDir subDir = new SubDir(Paths.get("/Users/tangfei/Desktop"), ".rtf");
 		mainPool.invoke(subDir);
 	}
 }

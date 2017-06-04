@@ -22,7 +22,6 @@ public class Clerk3 {
 				}
 			}
 			this.product = product;
-			this.product = product; 
 			System.out.printf("生产者设定 (%d)\n", this.product);
 			consumerSet.signal(); // 通知消费者等待集合中的消费者线程
 			
