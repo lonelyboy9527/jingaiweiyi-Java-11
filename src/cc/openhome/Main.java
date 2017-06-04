@@ -5,8 +5,8 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 //		exp1();
-//		exp2();
-		exp3();
+		exp2();
+//		exp3();
 	}
 	/* ********************11.3 并行Collection简介******************** */
 	public static void exp3() {
@@ -28,8 +28,8 @@ public class Main {
 		 * notify()、notifyAll()等细节。如果需要的是线程池，读写锁等高级操作，
 		 * 从JDK5之后提供了 java.util.concurrent包，可基于其中的API建立更稳固的并行应用程序。
 		 * */
-		MyClass2.exp1(); // 11.2.1 Lock、ReadWriteLock 与 Condition
-//		MyClass2.exp2(); // 11.2.2 使用 Executor
+//		MyClass2.exp1(); // 11.2.1 Lock、ReadWriteLock 与 Condition
+		MyClass2.exp2(); // 11.2.2 使用 Executor
 	}
 	/* ********************11.1 线程******************** */
 	public static void exp1() {
